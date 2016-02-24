@@ -1,11 +1,11 @@
 nNovel-Freetype
 ===============
 
-# Project status
+#### Project status
 Working in progress
 
-# Overview
+#### Overview
 A simple text reader runs on TI-nspire CX/CX-CAS with freetype and UTF-8 support.
 
-# Licenses
+#### Licenses
 MIT
