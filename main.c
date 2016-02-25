@@ -9,19 +9,18 @@ int main(int __attribute__((unused)) argc, char __attribute__((unused)) *argv[])
 	int w, h;
 	for (h = 0; h != screen_height; ++h)
 		for(w = 0; w != screen_width; ++w)
-			switch (h / 80) {
-			case 0:
-				set_pixel(screen, w, h, ((Pixel)0b11111) << 11);
-				break;
-			case 1:
-				set_pixel(screen, w, h, ((Pixel)0b111111) << 5);
-				break;
-			case 2:
-				set_pixel(screen, w, h, (Pixel)0b11111);
-				break;
-			}
+			set_pixel(screen, w, h, ((Pixel)0b11111) << 11);
+
+	apply_screen_buffer(screen);
+
+	wait_key_pressed();
+
+	for (h = 0; h != screen_height; ++h)
+		for(w = 0; w != screen_width; ++w)
+			set_pixel_alpha(screen, w, h, 0xFFFF, 0.5);
 	apply_screen_buffer(screen);
 	wait_key_pressed();
+
 	dispose_screen_buffer(screen);
 
 	return 0;
