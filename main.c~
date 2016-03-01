@@ -15,7 +15,7 @@ int main(int __attribute__((unused)) argc, char __attribute__((unused)) *argv[])
 
 	draw_text(screen, 0, 0, 16, 0xffff, L"Text");
 	draw_text(screen, 0, 16, 16, 0x1f, L"Text");
-	draw_text(screen, 0, 32, 16, 0x1f << 6, L"Text");
+	draw_text(screen, 0, 32, 16, 0x1f << 5, L"Text");
 	draw_text(screen, 0, 48, 16, 0x1f << 11, L"Text");
 	free_font();
 
