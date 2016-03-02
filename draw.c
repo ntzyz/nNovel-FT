@@ -145,10 +145,10 @@ void load_font_from_file(const char *font_file_name) {
 
 	slot = face->glyph;
 
-	matrix.xx = (FT_Fixed)( cos( 0 ) * 0x10000L );
-	matrix.xy = (FT_Fixed)(-sin( 0 ) * 0x10000L );
-	matrix.yx = (FT_Fixed)( sin( 0 ) * 0x10000L );
-	matrix.yy = (FT_Fixed)( cos( 0 ) * 0x10000L );
+	matrix.xx = (FT_Fixed)( cos(0) * 0x10000L);
+	matrix.xy = (FT_Fixed)(-sin(0) * 0x10000L);
+	matrix.yx = (FT_Fixed)( sin(0) * 0x10000L);
+	matrix.yy = (FT_Fixed)( cos(0) * 0x10000L);
 
 }
 
@@ -160,23 +160,21 @@ void free_font() {
 }
 
 void draw_bitmap(Screen screen, FT_Bitmap* bitmap, FT_Int x, FT_Int y, Pixel pixel) {
-  FT_Int  i, j, p, q, c;
-  FT_Int  x_max = x + bitmap->width;
-  FT_Int  y_max = y + bitmap->rows;
+	FT_Int  i, j, p, q, c;
+	FT_Int  x_max = x + bitmap->width;
+	FT_Int  y_max = y + bitmap->rows;
 
-  for ( i = x, p = 0; i < x_max; i++, p++ )
-  {
-    for ( j = y, q = 0; j < y_max; j++, q++ )
-    {
-      if ( i < 0 || j < 0 || i >= SCREEN_WIDTH || j >= SCREEN_HEIGHT )
-        continue;
+	for ( i = x, p = 0; i < x_max; i++, p++ ) {
+		for ( j = y, q = 0; j < y_max; j++, q++ ) {
+			if ( i < 0 || j < 0 || i >= SCREEN_WIDTH || j >= SCREEN_HEIGHT )
+				continue;
 
-      c = bitmap->buffer[q * bitmap->width + p];
+			c = bitmap->buffer[q * bitmap->width + p];
 
-      if ( c > 0 )
-           set_pixel_alpha(screen, i, j, pixel, c / 256.);
-    }
-  }
+			if ( c > 0 )
+				set_pixel_alpha(screen, i, j, pixel, c / 256.);
+		}
+	}
 }
 
 void draw_text(Screen screen, int x, int y, int line_height, Pixel pixel, wchar_t *text) {

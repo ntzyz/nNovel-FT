@@ -7,6 +7,7 @@ LD  = nspire-ld
 GENZEHN = genzehn
 
 GCCFLAGS = -Wall -W -marm
+GXXFLAGS = -Wall -W -marm
 LDFLAGS =
 ZEHNFLAGS = --name "nNovel-FreeType"
 
@@ -30,7 +31,7 @@ all: $(EXE).prg.tns
 	$(GCC) $(GCCFLAGS) -c $<
 
 %.o: %.cpp
-	$(GXX) $(GCCFLAGS) -c $<
+	$(GXX) $(GXXFLAGS) -c $<
 
 %.o: %.S
 	$(AS) -c $<
