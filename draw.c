@@ -1,8 +1,6 @@
 #include <libndls.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <ft2build.h>
-#include FT_FREETYPE_H
 #include <wchar.h>
 
 #include "draw.h"
@@ -10,18 +8,6 @@
 // screen size of nspire cx.
 const int screen_width = 320;
 const int screen_height = 240;
-
-static bool is_font_loaded = false;
-static unsigned char *font_resource = NULL;
-static size_t font_size;
-// Freetype
-static FT_Library library;
-static FT_Face face;
-
-static FT_GlyphSlot slot;
-static FT_Matrix matrix;
-static FT_Vector pen;
-static FT_Error error;
 
 // create a screen buffer for other drawing function.
 Screen create_new_screen_buffer() {
@@ -118,10 +104,20 @@ Pixel get_pixel_from_color(Color color) {
 	return ((uint16_t)color.r << 11) | ((uint16_t)color.g << 6) | ((uint16_t)color.b);
 }
 
-void load_font_from_file(const char *font_file_name) {
-	if (is_font_loaded) return;
+FONT *load_font_from_file(const char *font_file_name) {
+	FONT *font = malloc(sizeof (FONT) * 1);
+	if (!font) return NULL;
 
-	FILE *file = fopen(font_file_name, "rb");
+	font->font_path = (char *)malloc((strlen(font_file_name) + 1) * sizeof (char));
+	if (!font->font_path) {
+		free(font);
+		return NULL;
+	}
+	else {
+		strcpy(font->font_path, font_file_name);
+	}
+
+	FILE *file = fopen(font->font_path, "rb");
 	if (!file) {
 		printf("[ERROR] Font file does not exist: %s\n", font_file_name);
 		show_msgbox("Error", "Cannot load font.");
@@ -129,33 +125,33 @@ void load_font_from_file(const char *font_file_name) {
 	}
 
 	fseek(file, 0, SEEK_END);
-	font_size = ftell(file);
+	font->font_size = ftell(file);
 	fseek(file, 0, SEEK_SET);
-	font_resource = (unsigned char *)malloc(font_size * sizeof (char));
-	fread(font_resource, font_size, 1, file);
-	is_font_loaded = true;
+	font->font_resource = (unsigned char *)malloc(font->font_size * sizeof (char));
+	fread(font->font_resource, font->font_size, 1, file);
 
 	fclose(file);
 
-	error = FT_Init_FreeType( &library );
+	font->error = FT_Init_FreeType( &font->library );
 
-	error = FT_New_Memory_Face( library, font_resource, font_size, 0, &face );
+	font->error = FT_New_Memory_Face( font->library, font->font_resource, font->font_size, 0, &font->face );
 
-	error = FT_Set_Char_Size( face, 12 * 64, 0, 100, 0 );
+	font->error = FT_Set_Char_Size( font->face, 12 * 64, 0, 100, 0 );
 
-	slot = face->glyph;
+	font->slot = font->face->glyph;
 
-	matrix.xx = (FT_Fixed)( cos(0) * 0x10000L);
-	matrix.xy = (FT_Fixed)(-sin(0) * 0x10000L);
-	matrix.yx = (FT_Fixed)( sin(0) * 0x10000L);
-	matrix.yy = (FT_Fixed)( cos(0) * 0x10000L);
+	font->matrix.xx = (FT_Fixed)( cos(0) * 0x10000L);
+	font->matrix.xy = (FT_Fixed)(-sin(0) * 0x10000L);
+	font->matrix.yx = (FT_Fixed)( sin(0) * 0x10000L);
+	font->matrix.yy = (FT_Fixed)( cos(0) * 0x10000L);
 
+	return font;
 }
 
-void free_font() {
-	if (is_font_loaded) {
-		is_font_loaded = false;
-		free(font_resource);
+void free_font(FONT *font) {
+	if (font) {
+		free(font->font_path);
+		free(font);
 	}
 }
 
@@ -177,28 +173,28 @@ void draw_bitmap(Screen screen, FT_Bitmap* bitmap, FT_Int x, FT_Int y, Pixel pix
 	}
 }
 
-void draw_text(Screen screen, int x, int y, int line_height, Pixel pixel, wchar_t *text) {
+void draw_text(Screen screen, int x, int y, int line_height, Pixel pixel, wchar_t *text, FONT *font) {
 	int n, num_chars;
 	num_chars = wcslen(text);
 
-	pen.x = 0;
-	pen.y = 0;
+	font->pen.x = 0;
+	font->pen.y = 0;
 
 	for (n = 0; n < num_chars; n++)
 	{
 		/* set transformation */
-		FT_Set_Transform( face, &matrix, &pen );
+		FT_Set_Transform( font->face, &font->matrix, &font->pen );
 
 		/* load glyph image into the slot (erase previous one) */
-		error = FT_Load_Char( face, text[n], FT_LOAD_RENDER );
-		if ( error )
+		font->error = FT_Load_Char( font->face, text[n], FT_LOAD_RENDER );
+		if ( font->error )
 			continue;  /* ignore errors */
 
 		/* now, draw to our target surface (convert position) */
-		draw_bitmap(screen, &slot->bitmap, x + slot->bitmap_left, line_height + y - slot->bitmap_top, pixel);
+		draw_bitmap(screen, &font->slot->bitmap, x + font->slot->bitmap_left, line_height + y - font->slot->bitmap_top, pixel);
 
 		/* increment pen position */
-		pen.x += slot->advance.x;
-		pen.y += slot->advance.y;
+		font->pen.x += font->slot->advance.x;
+		font->pen.y += font->slot->advance.y;
 	}
 }

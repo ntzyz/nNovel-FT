@@ -10,7 +10,13 @@ int main(int __attribute__((unused)) argc, char __attribute__((unused)) *argv[])
 
 	Screen screen = create_new_screen_buffer();
 
-	load_font_from_file("/documents/ndless/wqy.ttc.tns");
+	FONT *font = load_font_from_file("/documents/ndless/wqy.ttc.tns");
+
+	show_msgbox("Information", "wqy-microhei load successfully.");
+
+	FONT *font2 = load_font_from_file("/documents/ndless/simkai.ttf.tns");
+
+	show_msgbox("Information", "simkai load successfully.");
 
 	for (int x = 0; x != screen_width; ++x)
 		for (int y = 0; y != screen_height; ++y)
@@ -25,13 +31,13 @@ int main(int __attribute__((unused)) argc, char __attribute__((unused)) *argv[])
 
 	text = UTF8_to_wchar(raw_text);
 
-	draw_text(screen, 0, 0, 16, 0xffff, text);
-	draw_text(screen, 0, 20, 16, 0x1f, text);
-	draw_text(screen, 0, 40, 16, 0x1f << 6, text);
-	draw_text(screen, 0, 60, 16, 0x1f << 11, text);
+	draw_text(screen, 0, 0, 16, 0xffff, text, font);
+	draw_text(screen, 0, 20, 16, 0x1f, text, font);
+	draw_text(screen, 0, 40, 16, 0x1f << 6, text, font2);
+	draw_text(screen, 0, 60, 16, 0x1f << 11, text, font2);
 
 	free(text);
-	free_font();
+	free_font(font);
 
 	apply_screen_buffer(screen);
 	wait_key_pressed();
