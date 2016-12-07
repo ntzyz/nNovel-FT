@@ -31,7 +31,7 @@ std::wstring FromUTF8(const char* str)
                 throw 0;
             else if(s[i] < 0xE0)    // C0-DF: 2 byte codepoint
             {
-                if((s[i+1] & 0xC0) != 0x80)		throw 1;
+                if((s[i+1] & 0xC0) != 0x80)        throw 1;
 
                 ret +=  ((s[i  ] & 0x1F) << 6) |
                         ((s[i+1] & 0x3F));
@@ -39,8 +39,8 @@ std::wstring FromUTF8(const char* str)
             }
             else if(s[i] < 0xF0)    // E0-EF: 3 byte codepoint
             {
-                if((s[i+1] & 0xC0) != 0x80)		throw 1;
-                if((s[i+2] & 0xC0) != 0x80)		throw 2;
+                if((s[i+1] & 0xC0) != 0x80)        throw 1;
+                if((s[i+2] & 0xC0) != 0x80)        throw 2;
 
                 wchar_t ch =
                         ((s[i  ] & 0x0F) << 12) |
@@ -56,9 +56,9 @@ std::wstring FromUTF8(const char* str)
             }
             else if(s[i] < 0xF8)    // F0-F7: 4 byte codepoint
             {
-                if((s[i+1] & 0xC0) != 0x80)		throw 1;
-                if((s[i+2] & 0xC0) != 0x80)		throw 2;
-                if((s[i+3] & 0xC0) != 0x80)		throw 3;
+                if((s[i+1] & 0xC0) != 0x80)        throw 1;
+                if((s[i+2] & 0xC0) != 0x80)        throw 2;
+                if((s[i+3] & 0xC0) != 0x80)        throw 3;
 
                 unsigned long ch =
                         ((s[i  ] & 0x07) << 18) |
@@ -71,7 +71,7 @@ std::wstring FromUTF8(const char* str)
                 if((ch & 0xFFF800) == 0xD800)
                     ch = badchar;
 
-                if(ch < 0x10000)	// overlong encoding -- but technically possible
+                if(ch < 0x10000)    // overlong encoding -- but technically possible
                     ret += static_cast<wchar_t>(ch);
                 else if(std::numeric_limits<wchar_t>::max() < 0x110000)
                 {
@@ -106,8 +106,8 @@ std::wstring FromUTF8(const char* str)
 }
 
 wchar_t *UTF8_to_wchar(const char *str) {
-	std::wstring ws = FromUTF8(str);
-	wchar_t *pws = (wchar_t *)malloc (sizeof (wchar_t) * (ws.length() + 1));
-	wcscpy(pws, ws.c_str());
-	return pws;
+    std::wstring ws = FromUTF8(str);
+    wchar_t *pws = (wchar_t *)malloc (sizeof (wchar_t) * (ws.length() + 1));
+    wcscpy(pws, ws.c_str());
+    return pws;
 }
