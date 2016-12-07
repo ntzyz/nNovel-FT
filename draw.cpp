@@ -25,7 +25,7 @@ void Screen::apply() {
 void Screen::setPixel(size_t x, size_t y, pixel_t pixel) {
     pixel_t *p = screenBuffer;
 	// check if the coordinate is inside of the screen.
-	if (x >= 0 && x < screenWidth && y >= 0 && y < screenHeight) {
+	if (x < screenWidth && y < screenHeight) {
 		p += y * screenWidth + x;
 		*p = pixel;
 	} else {
@@ -36,7 +36,7 @@ void Screen::setPixel(size_t x, size_t y, pixel_t pixel) {
 pixel_t Screen::getPixel(size_t x, size_t y) {
     pixel_t *p = screenBuffer;
 	// check if the coordinate is inside of the screen.
-	if (x >= 0 && x < screenWidth && y >= 0 && y < screenHeight) {
+	if (x < screenWidth && y < screenHeight) {
 		p += y * screenWidth + x;
 		return *p;
 	} else {
@@ -50,7 +50,7 @@ void Screen::setPixelAlpha(size_t x, size_t y, pixel_t pixel, alpha_t alpha) {
 		printf("[WARN] set_pixel_alpha: Opacity not valid.");
 		return;
 	}
-	else if (x < 0 || x >= screenWidth || y < 0 || y >= screenHeight) {
+	else if (x >= screenWidth || y >= screenHeight) {
 		printf("[WARN] get_pixel: Coordinate of the pixel is not valid!");
 		return;
 	}
@@ -72,5 +72,5 @@ Color::Color(const pixel_t &pixel) {
     b = pixel & 0x1F;
 }
 pixel_t Color::toPixel() {
-    return ((pixel_t)r << 11) | ((pixel_t)g << 6) | ((pixel_t)b);
+    return ((pixel_t)r << 11) | ((pixel_t)g << 5) | ((pixel_t)b);
 }

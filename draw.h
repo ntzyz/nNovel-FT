@@ -24,7 +24,7 @@ class Color {
 public:
     uint8_t r, g, b;
     Color() : r(0), g(0), b(0) {};
-    Color(const uint8_t &_r, const uint8_t &_g, const uint8_t &_b) : r(_r), g(_g), b(_b) {};
+    Color(const uint8_t &_r, const uint8_t &_g, const uint8_t &_b) : r(_r >> 3), g(_g >> 2), b(_b >> 3) {};
     Color(const pixel_t &pixel);
     pixel_t toPixel();
 };
