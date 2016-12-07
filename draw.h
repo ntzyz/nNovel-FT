@@ -1,46 +1,30 @@
-#ifndef _DRAW_H_
-#define _DRAW_H_
+#pragma once
+#include <cstdint>
 
-#include <stdint.h>
-#include <ft2build.h>
-#include FT_FREETYPE_H
+using pixel_t=uint16_t;
+using alpha_t=float;
 
-typedef uint16_t Pixel;
-typedef float Alpha;
-typedef Pixel* Screen;
-typedef struct {
-	uint8_t r, g, b;
-} Color;
-typedef struct {
-	char *font_path;
-	unsigned char* font_resource;
-	size_t font_size;
-	FT_Library library;
-	FT_Face face;
+const size_t screenWidth = 320;
+const size_t screenHeight = 240;
 
-	FT_GlyphSlot slot;
-	FT_Matrix matrix;
-	FT_Vector pen;
-	FT_Error error;
-}FONT;
+class Screen {
+private:
+    pixel_t *screenBuffer = nullptr;
+public:
+    Screen();
+    ~Screen();
 
-extern const int screen_width;
-extern const int screen_height;
+    void apply();
+    void setPixel(size_t x, size_t y, pixel_t pixel);
+    pixel_t getPixel(size_t x, size_t y);
+    void setPixelAlpha(size_t x, size_t y, pixel_t pixel, alpha_t alpha);
+};
 
-Screen create_new_screen_buffer();
-void dispose_screen_buffer(Screen screen);
-void apply_screen_buffer(Screen screen);
-
-void set_pixel(Screen screen, int x, int y, Pixel pixel);
-void set_pixel_alpha(Screen screen, int x, int y, Pixel pixel, Alpha alpha);
-
-Pixel get_pixel(Screen screen, int x, int y);
-
-Color get_color_from_pixel(Pixel pixel);
-Pixel get_pixel_from_color(Color color);
-
-FONT* load_font_from_file(const char *font_file_name);
-void free_font(FONT *font);
-void draw_text(Screen screen, int x, int y, int line_height, Pixel pixel, wchar_t *text, FONT *font);
-
-#endif //_DRAW_H_
+class Color {
+public:
+    uint8_t r, g, b;
+    Color() : r(0), g(0), b(0) {};
+    Color(const uint8_t &_r, const uint8_t &_g, const uint8_t &_b) : r(_r), g(_g), b(_b) {};
+    Color(const pixel_t &pixel);
+    pixel_t toPixel();
+};
