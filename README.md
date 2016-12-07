@@ -1,5 +1,5 @@
-nNovel-Freetype
-===============
+nNovel-FT
+=========
 
 #### Project status
 Working in progress
