@@ -22,7 +22,7 @@ void Screen::apply() {
     lcd_blit(screenBuffer, SCR_320x240_565);
 }
 
-void Screen::setPixel(size_t x, size_t y, pixel_t pixel) {
+void Screen::setPixel(uint32_t x, uint32_t y, pixel_t pixel) {
     pixel_t *p = screenBuffer;
     // check if the coordinate is inside of the screen.
     if (x < screenWidth && y < screenHeight) {
@@ -33,7 +33,11 @@ void Screen::setPixel(size_t x, size_t y, pixel_t pixel) {
     }
 }
 
-pixel_t Screen::getPixel(size_t x, size_t y) {
+void Screen::setPixel(Coord coord, pixel_t pixel) {
+    this->setPixel(coord.x, coord.y, pixel);
+}
+
+pixel_t Screen::getPixel(uint32_t x, uint32_t y) {
     pixel_t *p = screenBuffer;
     // check if the coordinate is inside of the screen.
     if (x < screenWidth && y < screenHeight) {
@@ -45,13 +49,13 @@ pixel_t Screen::getPixel(size_t x, size_t y) {
     }
 }
 
-void Screen::setPixelAlpha(size_t x, size_t y, pixel_t pixel, alpha_t alpha) {
+pixel_t Screen::getPixel(Coord coord) {
+    return this->getPixel(coord.x, coord.y);
+}
+
+void Screen::setPixelAlpha(uint32_t x, uint32_t y, pixel_t pixel, alpha_t alpha) {
     if (alpha < 0 || alpha > 1) {
-        printf("[WARN] set_pixel_alpha: Opacity not valid.");
-        return;
-    }
-    else if (x >= screenWidth || y >= screenHeight) {
-        printf("[WARN] get_pixel: Coordinate of the pixel is not valid!");
+        printf("[WARN] setPixelAlpha: Opacity not valid.");
         return;
     }
 
@@ -66,11 +70,24 @@ void Screen::setPixelAlpha(size_t x, size_t y, pixel_t pixel, alpha_t alpha) {
     this->setPixel(x, y, color.toPixel());
 }
 
+void Screen::setPixelAlpha(Coord coord, pixel_t pixel, alpha_t alpha) {
+    this->setPixelAlpha(coord.x, coord.y, pixel, alpha);
+}
+
+void Screen::fillRect(Rect rect, pixel_t pixel) {
+    for (register auto x = rect.left; x <= rect.right; ++x) {
+        for (register auto y = rect.top; y <= rect.bottom; ++y) {
+            this->setPixel(x, y, pixel);
+        }
+    }
+}
+
 Color::Color(const pixel_t &pixel) {
     r = (pixel >> 11) & 0x1F;
-    g = (pixel >> 6) & 0x1F;
+    g = (pixel >> 5) & 0x3F;
     b = pixel & 0x1F;
 }
+
 pixel_t Color::toPixel() {
     return ((pixel_t)r << 11) | ((pixel_t)g << 5) | ((pixel_t)b);
 }

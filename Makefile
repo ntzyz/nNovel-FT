@@ -9,7 +9,7 @@ GENZEHN = genzehn
 GCCFLAGS = -Wall -W -marm
 GXXFLAGS = -Wall -W -marm
 LDFLAGS =
-ZEHNFLAGS = --name "nNovel-FreeType"
+ZEHNFLAGS = --name "nNovel-FT"
 
 ifeq ($(DEBUG),FALSE)
 	GCCFLAGS += -Os
@@ -20,7 +20,7 @@ endif
 OBJS = $(patsubst %.c, %.o, $(shell find . -name \*.c))
 OBJS += $(patsubst %.cpp, %.o, $(shell find . -name \*.cpp))
 OBJS += $(patsubst %.S, %.o, $(shell find . -name \*.S))
-EXE = nNovel-Freetype
+EXE = nNovel-FT
 DISTDIR = .
 vpath %.tns $(DISTDIR)
 vpath %.elf $(DISTDIR)
@@ -42,6 +42,7 @@ $(EXE).elf: $(OBJS)
 
 $(EXE).tns: $(EXE).elf
 	$(GENZEHN) --input $(DISTDIR)/$^ --output $(DISTDIR)/$@ $(ZEHNFLAGS)
+	cp $(EXE).tns /media/ntzyz/Storage/tmp
 
 $(EXE).prg.tns: $(EXE).tns
 	make-prg $(DISTDIR)/$^ $(DISTDIR)/$@
