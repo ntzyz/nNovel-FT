@@ -93,12 +93,12 @@ pixel_t Color::toPixel() {
 #ifdef ENABLE_FREETYPE
 
 font_t::font_t(const char *_fontPath) {
-    fontPath = string(_fontPath);
+    fontPath = std::string(_fontPath);
     init();
 }
 
-font_t::font_t(const string &_fontPath) {
-    fontPath = string(_fontPath);
+font_t::font_t(const std::string &_fontPath) {
+    fontPath = std::string(_fontPath);
     init();
 }
 
@@ -136,7 +136,6 @@ void font_t::init() {
     // Setup Freetype
     error = FT_Init_FreeType(&library);
     error = FT_New_Memory_Face(library, fontRC, fontSize, 0, &face);
-    error = FT_Set_Pixel_Sizes(face, 12, 0);
     slot = face->glyph;
 
     matrix.xx = (FT_Fixed)( cos(0) * 0x10000L);
@@ -165,6 +164,7 @@ void font_t::drawText(Screen& screen, int x, int y, int line_height, pixel_t pix
 
     pen.x = 0;
     pen.y = 0;
+    FT_Set_Pixel_Sizes(face, 0, line_height);
 
     for (n = 0; n < num_chars; n++)
     {

@@ -4,7 +4,6 @@
 
 using pixel_t=uint16_t;
 using alpha_t=float;
-using namespace std;
 
 const size_t screenWidth = 320;
 const size_t screenHeight = 240;
@@ -56,7 +55,7 @@ public:
 
 class font_t {
 private:
-    string fontPath;
+    std::string fontPath;
     FILE *file;
     uint8_t *fontRC;
     size_t fontSize;
@@ -70,7 +69,7 @@ private:
     void drawBitmap(Screen& screen, FT_Bitmap* bitmap, FT_Int x, FT_Int y, pixel_t pixel);
 public:
     font_t(const char *_fontPath);
-    font_t(const string &_fontPath);
+    font_t(const std::string &_fontPath);
     ~font_t();
     void drawText(Screen& screen, int x, int y, int line_height, pixel_t pixel, const wchar_t *text);
 };
