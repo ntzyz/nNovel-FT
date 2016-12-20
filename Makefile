@@ -6,8 +6,8 @@ GXX = nspire-g++
 LD  = nspire-ld
 GENZEHN = genzehn
 
-GCCFLAGS = -Wall -W -marm
-GXXFLAGS = -Wall -W -marm
+GCCFLAGS = -Wall -W -marm -DENABLE_FREETYPE
+GXXFLAGS = -Wall -W -marm -DENABLE_FREETYPE
 LDFLAGS =
 ZEHNFLAGS = --name "nNovel-FT"
 
