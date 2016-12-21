@@ -26,8 +26,10 @@ void Screen::setPixel(uint32_t x, uint32_t y, pixel_t pixel) {
     if (x < screenWidth && y < screenHeight) {
         p += y * screenWidth + x;
         *p = pixel;
+#ifdef ENABLE_RUNTIME_WARNING
     } else {
         printf("[WARN] setPixel: Coordinate of the pixel is not valid!");
+#endif
     }
 }
 
@@ -42,7 +44,9 @@ pixel_t Screen::getPixel(uint32_t x, uint32_t y) {
         p += y * screenWidth + x;
         return *p;
     } else {
+#ifdef ENABLE_RUNTIME_WARNING
         printf("[WARN] getPixel: Coordinate of the pixel is not valid!");
+#endif
         return 0;
     }
 }
@@ -53,7 +57,9 @@ pixel_t Screen::getPixel(Coord coord) {
 
 void Screen::setPixelAlpha(uint32_t x, uint32_t y, pixel_t pixel, alpha_t alpha) {
     if (alpha < 0 || alpha > 1) {
+#ifdef ENABLE_RUNTIME_WARNING
         printf("[WARN] setPixelAlpha: Opacity not valid.");
+#endif
         return;
     }
 
@@ -162,25 +168,37 @@ void font_t::drawText(Screen& screen, int x, int y, int line_height, pixel_t pix
     int n, num_chars;
     num_chars = wcslen(text);
 
-    pen.x = 0;
-    pen.y = 0;
+    pen.x = x;
+    pen.y = y;
     FT_Set_Pixel_Sizes(face, 0, line_height);
 
     for (n = 0; n < num_chars; n++)
     {
-        FT_Set_Transform(face, &matrix, &pen);
+        if (text[n] == L'\r') {
+            continue;
+        }
+        if (text[n] == L'\n') {
+            pen.x = 0; pen.y += line_height;
+            continue;
+        }
 
-        /* load glyph image into the slot (erase previous one) */
-        error = FT_Load_Char(face, text[n], FT_LOAD_RENDER);
-        if (error)
-            continue;  /* ignore errors */
+        FT_UInt glyph_index = FT_Get_Char_Index(face, text[n]);
 
-        /* now, draw to our target surface (convert position) */
-        drawBitmap(screen, &slot->bitmap, x + slot->bitmap_left, line_height + y - slot->bitmap_top, pixel);
+        error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
+        if (error) continue;
+
+        error = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
+        if (error) continue;
+
+        if (slot->bitmap_left + pen.x + slot->bitmap.width >= screenWidth) {
+            pen.x = 0; pen.y += line_height;
+        }
+
+        drawBitmap(screen, &slot->bitmap, slot->bitmap_left + pen.x, line_height - slot->bitmap_top + pen.y, pixel);
 
         /* increment pen position */
-        pen.x += slot->advance.x;
-        pen.y += slot->advance.y;
+        pen.x += slot->advance.x >> 6;
+        pen.y += slot->advance.y >> 6;
     }
 }
 
