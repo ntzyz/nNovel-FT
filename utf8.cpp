@@ -7,7 +7,7 @@
 
 /**
  * From http://www.cplusplus.com/forum/general/31270/
- * Will be rewrite later.
+ * Will be rewritten later.
  **/
 std::wstring FromUTF8(const char* str)
 {
