@@ -1,33 +1,52 @@
 #include <libndls.h>
 #include <ctime>
 #include <cmath>
+#include <wchar.h>
+#include <cstdio>
+
+#include <sstream>
+#include <fstream>
+#include <codecvt>
+#include <string>
+#include <ios>
 
 #include "draw.h"
+#include "utf8.h"
 
 const double pi = 3.14159265358979;
 
 int main() {
     Screen screen;
-    double i;
+    font_t font("/documents/ndless/wqy.ttc.tns");
 
-    long * const p_RTC = (long*)0x90090000;
-    auto curr = *p_RTC;
-    int frames = 0;
-    while (curr == *p_RTC);
-    curr = *p_RTC;
+    std::ifstream ifs("/documents/ndless/text.txt.tns", std::ios::in | std::ios::binary);
 
-    while (*p_RTC < curr + 30) {
-        i += 2 * pi / 64;
-        auto c = Color(static_cast<u_int8_t>(127. * sin(i) + 127.),
-                       static_cast<u_int8_t>(127. * sin(i + pi * 2 / 3) + 127.), 
-                       static_cast<u_int8_t>(127. * sin(i + pi * 4 / 3) + 127.)).toPixel();
-        screen.fillRect(Rect(0, 0, screenWidth - 1, screenHeight - 1), c);
+    ifs.seekg(0, std::ios::end);
+    std::streampos size = ifs.tellg();
+
+    ifs.seekg(0, std::ios::beg);
+    char *buf = new char[size + static_cast<std::streampos>(10)];
+    ifs.read(buf, size);
+
+    show_msgbox("title", buf);
+
+    wchar_t *ws = UTF8_to_wchar(buf);
+
+    int fontSize = 16;
+    while (!isKeyPressed(KEY_NSPIRE_ESC)) {
+        if (isKeyPressed(KEY_NSPIRE_PLUS))
+            fontSize++;
+        if (isKeyPressed(KEY_NSPIRE_MINUS))
+            fontSize--;
+        if (fontSize < 0) fontSize = 0;
+        screen.fillRect(Rect(0, 0, screenWidth - 1, screenHeight - 1), Color(0, 0, 0).toPixel());
+        font.drawText(screen, 0, 0, fontSize, Color(0x66, 0xcc, 0xff).toPixel(), ws);
         screen.apply();
-        frames++;
+        wait_key_pressed();
     }
+    // font.drawText(screen, 0, 32, 16, Color(0x66, 0xcc, 0xff).toPixel(), L"人们为什么喷 Internet Explorer (IE)？");
 
-    char msg[512];
-    sprintf(msg, "We had %d frames in %ld secs.", frames, *p_RTC - curr);
-    show_msgbox("", msg);
+    delete[] ws;
+
     return 0;
 }

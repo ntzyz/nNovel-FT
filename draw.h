@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <string>
 
 using pixel_t=uint16_t;
 using alpha_t=float;
@@ -46,3 +47,31 @@ public:
     Color(const pixel_t &pixel);
     pixel_t toPixel();
 };
+
+
+#ifdef ENABLE_FREETYPE
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+class font_t {
+private:
+    std::string fontPath;
+    FILE *file;
+    uint8_t *fontRC;
+    size_t fontSize;
+    FT_Library library;
+    FT_Face face;
+    FT_GlyphSlot slot;
+    FT_Matrix matrix;
+    FT_Vector pen;
+    FT_Error error;
+    void init();
+    void drawBitmap(Screen& screen, FT_Bitmap* bitmap, FT_Int x, FT_Int y, pixel_t pixel);
+public:
+    font_t(const char *_fontPath);
+    font_t(const std::string &_fontPath);
+    ~font_t();
+    void drawText(Screen& screen, int x, int y, int line_height, pixel_t pixel, const wchar_t *text);
+};
+
+#endif
